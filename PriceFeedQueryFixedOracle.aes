@@ -1,7 +1,7 @@
 // THIS IS NOT SECURITY AUDITED
 // DO NEVER USE THIS WITHOUT SECURITY AUDIT FIRST
 
-contract PriceFeedQuery =
+contract PriceFeedQueryFixedOracle =
 
   type o = oracle(string, string)
   type oq = oracle_query(string, string)
@@ -16,5 +16,5 @@ contract PriceFeedQuery =
     require(Oracle.check(state), "ORACLE_CHECK_FAILED")
     Oracle.query(state, currency, fee, RelativeTTL(20), RelativeTTL(20))
 
-  entrypoint checkQuery(query : oq) =
+  entrypoint checkQuery(query : oq) : option(string) =
     Oracle.get_answer(state, query)

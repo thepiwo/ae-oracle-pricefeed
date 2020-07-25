@@ -16,5 +16,5 @@ contract PriceFeedQuery =
     require(Oracle.check(oracle), "ORACLE_CHECK_FAILED")
     Oracle.query(oracle, currency, fee, RelativeTTL(20), RelativeTTL(20))
 
-  entrypoint checkQuery(oracle : o, query : oq) =
+  entrypoint checkQuery(oracle : o, query : oq) : option(string) =
     Oracle.get_answer(oracle, query)
