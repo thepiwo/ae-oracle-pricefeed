@@ -16,7 +16,7 @@ module.exports = class Aeternity {
       this.client = await Universal({
         nodes: [
           {
-            name: 'mainnetNode',
+            name: 'node',
             instance: await Node({
               url: process.env.NODE_URL || url,
               internalUrl: process.env.NODE_URL || url,

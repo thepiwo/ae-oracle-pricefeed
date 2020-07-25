@@ -23,3 +23,10 @@ to integrate with your smart contract you can copy the logic or deploy these sep
 
 1. call `queryAePrice` passing the required query fee as amount, save returned query id
 2. after oracle probably responded, use the saved query id and call `checkQuery` to receive price returned from oracle
+
+## Sample hosted mainnet oracle contract
+`ct_29LHZSA9r7FpR5UxHtip9RYUFhtvT3tQcQosZZHUg4FM7dXT6c` fee 200000000000000 aetto
+
+## Sample sdk integration
+ - implementation [src/exampleSDK.js](./src/exampleSDK.js) 
+ - running `NODE_URL=https://mainnet.aeternity.io/ CONTRACT_ADDRESS=ct_GfST8P7YxMv2TpTSwh9SC1qgH7QdQqz8WjCTzyG1sDxxpKNHN PUBLIC_KEY=... SECRET_KEY=... node src/exampleSDK.js`
