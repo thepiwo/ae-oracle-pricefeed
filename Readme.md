@@ -25,7 +25,8 @@ to integrate with your smart contract you can copy the logic or deploy these sep
 2. after oracle probably responded, use the saved query id and call `checkQuery` to receive price returned from oracle
 
 ## Sample hosted mainnet oracle contract
-`ct_29LHZSA9r7FpR5UxHtip9RYUFhtvT3tQcQosZZHUg4FM7dXT6c` fee 200000000000000 aetto
+ - oracle: `ok_2NRBaMsgSDjZRFw4dU82KCqLa5W7aQdbJAzaFprTpjEGLAzroV` fee 200000000000000 aetto
+ - contract: `ct_GfST8P7YxMv2TpTSwh9SC1qgH7QdQqz8WjCTzyG1sDxxpKNHN`
 
 ## Sample sdk integration
  - implementation [src/exampleSDK.js](./src/exampleSDK.js) 
