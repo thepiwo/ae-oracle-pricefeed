@@ -67,15 +67,19 @@ module.exports = class PriceFeedOracle {
     const queryString = String(Crypto.decodeBase64Check(query.query.slice(3))).slice(0, 3);
     console.log("oracle got query", queryString);
 
-    const response = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=aeternity&vs_currencies=${queryString}`)
-      .then(res => res.data.aeternity[queryString])
-
-    if (response) {
-      console.log("oracle will respond", response);
-      await this.oracle.respondToQuery(query.id, new BigNumber(response).toFixed(), {responseTtl: {type: 'delta', value: 20}});
-    } else {
-      console.log("oracle will not respond, no result found in page")
-    }
+    // Internal BTCS API
+    axios.post("https://exchanges.bitcoinsuisse.ch/V4/api/ExchangeRate/rates", {
+      Rates: [
+        {
+          FromCurrencyCode: "AE",
+          ToCurrencyCode: queryString,
+        }
+      ]
+    }).then(res => {
+        const price = new BigNumber(res.data.Rates[0].Value).toFixed();
+        console.log("oracle will respond", price);
+        this.oracle.respondToQuery(query.id, price, {responseTtl: {type: 'delta', value: 20}});
+    }).catch(err => console.log("oracle will not respond", err));
   };
 
   stopPolling = () => {
@@ -90,4 +94,3 @@ module.exports = class PriceFeedOracle {
     return typeof this.stopPollQueries === 'function' && (await this.aeternity.client.height()) < this.oracle.ttl;
   }
 };
-
