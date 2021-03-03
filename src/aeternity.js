@@ -47,6 +47,12 @@ module.exports = class Aeternity {
 
   atomsToAe = (atoms) => (new BigNumber(atoms)).dividedBy(new BigNumber(1000000000000000000));
 
+  timeoutAwaitFunding = async (fundingAmount) => {
+    if (!this.stopAwaitFunding) setTimeout(() => {
+      this.awaitFunding(fundingAmount)
+    }, 120 * 1000);
+  }
+
   awaitFunding = async (fundingAmount) => {
     if (!this.client) throw "Client not initialized";
 
@@ -57,16 +63,14 @@ module.exports = class Aeternity {
         const interval = setInterval(async () => {
           if (new BigNumber(await this.client.getBalance(this.keypair.publicKey)).isGreaterThanOrEqualTo(fundingAmount)) {
             console.log("received funding");
-            resolve(true);
-            this.awaitFunding(fundingAmount)
+            this.timeoutAwaitFunding(fundingAmount)
             clearInterval(interval);
+            resolve(true);
           }
         }, 2000);
       });
     } else {
-      if (!this.stopAwaitFunding) setTimeout(() => {
-        this.awaitFunding(fundingAmount)
-      }, 20000);
+      this.timeoutAwaitFunding(fundingAmount)
     }
   };
 
