@@ -19,7 +19,6 @@ module.exports = class Aeternity {
             name: 'node',
             instance: await Node({
               url: process.env.NODE_URL || url,
-              internalUrl: process.env.NODE_URL || url,
             }),
           }],
         accounts: [MemoryAccount({keypair: this.keypair})],
@@ -30,7 +29,7 @@ module.exports = class Aeternity {
   getKeyPair = (defaultKeyPair) => {
     if (defaultKeyPair) return defaultKeyPair;
 
-    const keypairFile = path.resolve(__dirname, "../.data/keypair.json");
+    const keypairFile = path.resolve(__dirname, "../../.data/keypair.json");
     const persisted = fs.existsSync(keypairFile);
     if (persisted) {
       return JSON.parse(fs.readFileSync(keypairFile), "utf-8");

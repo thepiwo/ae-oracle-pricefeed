@@ -6,4 +6,4 @@ RUN npm install
 
 COPY . /app
 
-CMD ["node", "src/index.js"]
+CMD ["node", "src/operator/index.js"]

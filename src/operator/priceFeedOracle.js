@@ -71,8 +71,8 @@ module.exports = class PriceFeedOracle {
       .then(res => res.data.aeternity[queryString])
 
     if (response) {
-      console.log("oracle will respond", response);
-      await this.oracle.respondToQuery(query.id, new BigNumber(response).toFixed(), {responseTtl: {type: 'delta', value: 20}});
+      console.log("oracle will respond:", response);
+      await this.oracle.respondToQuery(query.id, new BigNumber(response).toFixed(), {responseTtl: query.responseTtl});
     } else {
       console.log("oracle will not respond, no result found in page")
     }
