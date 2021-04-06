@@ -6,15 +6,18 @@ contract PriceFeedQuery =
   type o = oracle(string, string)
   type oq = oracle_query(string, string)
 
-  type state = unit
-  entrypoint init() = ()
+  type state = o
+  entrypoint init(oracle : o) = oracle
 
-  payable stateful entrypoint queryAePrice(oracle : o, currency : string) =
-    let fee = Oracle.query_fee(oracle)
+  entrypoint queryFee() =
+    Oracle.query_fee(state)
+
+  payable stateful entrypoint queryAePrice(currency : string) =
+    let fee = queryFee()
     require(Call.value == fee, String.concat("AMOUNT_NOT_EQUAL_FEE_", Int.to_str(fee)))
     require(String.length(currency) == 3, "INCORRECT_CURRENCY_LENGTH")
-    require(Oracle.check(oracle), "ORACLE_CHECK_FAILED")
-    Oracle.query(oracle, currency, fee, RelativeTTL(20), RelativeTTL(20))
+    require(Oracle.check(state), "ORACLE_CHECK_FAILED")
+    Oracle.query(state, currency, fee, RelativeTTL(20), RelativeTTL(20))
 
-  entrypoint checkQuery(oracle : o, query : oq) : option(string) =
-    Oracle.get_answer(oracle, query)
+  entrypoint checkQuery(query : oq) : option(string) =
+    Oracle.get_answer(state, query)
