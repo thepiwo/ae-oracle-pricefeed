@@ -8,7 +8,7 @@ git clone https://github.com/thepiwo/ae-oracle-pricefeed
 cd ae-oracle-pricefeed
 
 # build container
-docker build -t ae-oracle-pricefeed
+docker build -t ae-oracle-pricefeed .
 
 # run, follow instructions to fund account, configure NODE_URL for other aeternity node
 docker run -it --name pricefeed -v "$PWD/.data:/app/.data" -e NODE_URL=https://testnet.aeternity.io/ ae-oracle-pricefeed
