@@ -1,4 +1,18 @@
 # Aeternity Pricefeed Oracle
+The **ae-oracle-pricefeed** is an example service that can be hosted and allows clients to query the current price of AE.
+
+On startup of the service following tasks are being executed:
+1. The sdk-client is being initialized with the keypair provided via `./data/keypair.json` (when using the command to host by hourself) or alternatively generates a new keypair if no keypair is provided
+1. The service checks if the account of the provided keypair has enough funds to run the oracle
+    - if NOT it prints the respective information in the console and waits for respective funding (on testnet this can easily be done using https://faucet.aepps.com/)
+1. If the balance check is successful the service checks if the oracle is already registered
+    - if NOT the oracle will be registered
+1. The service logs the oracle id to the console
+    - this will be required for other contracts or services in order to query the oracle
+1. The service now periodically:
+    - extends the TTL of the oracle if necessary
+    - polls the node for queries that have to be answered
+    - responds to queries if they exist
 
 ## Host yourself
 
@@ -14,19 +28,21 @@ docker build -t ae-oracle-pricefeed .
 docker run -it --name pricefeed -v "$PWD/.data:/app/.data" -e NODE_URL=https://testnet.aeternity.io/ ae-oracle-pricefeed
 ```
 
-## Use hosted
+## Hosted on mainnet
 
-to integrate with your smart contract you can copy the logic or deploy these separately and do remote calls
+There the ae-oracle-pricefeed oracle is running on mainnet:
+- https://mainnet.aeternity.io/v3/oracles/ok_2NRBaMsgSDjZRFw4dU82KCqLa5W7aQdbJAzaFprTpjEGLAzroV
 
- - to query any compatible oracle compare [PriceFeedQuery.aes](./PriceFeedQuery.aes) 
+## Sample how to query the oracle using the SDK
+- implementation [src/user/queryUsingSDK.js](./src/user/queryUsingSDK.js) 
+- running `NODE_URL=https://testnet.aeternity.io/ ORACLE_ID=... SECRET_KEY=... node src/user/queryUsingSDK.js` will initialize the SDK, query the oracle for the AE price in EUR and wait for the response of the oracle
+    - it's required to provide `ORACLE_ID` and `SECRET_KEY`
+    - the `ORACLE_ID` should be visible in the logs of ae-oracle-pricefeed service
+    - for `SECRET_KEY` you should - of course - use your own key and you need to make sure that the account you are using has enough funds to query the oracle (for testnet you can use https://faucet.aepps.com/)
 
-1. call `queryAePrice` passing the required query fee as amount, save returned query id
-2. after oracle probably responded, use the saved query id and call `checkQuery` to receive price returned from oracle
-
-## Sample hosted mainnet oracle contract
- - oracle: `ok_2NRBaMsgSDjZRFw4dU82KCqLa5W7aQdbJAzaFprTpjEGLAzroV` fee 200000000000000 aetto
- - contract: `ct_GfST8P7YxMv2TpTSwh9SC1qgH7QdQqz8WjCTzyG1sDxxpKNHN`
-
-## Sample sdk integration
- - implementation [src/exampleSDK.js](./src/exampleSDK.js) 
- - running `NODE_URL=https://mainnet.aeternity.io/ CONTRACT_ADDRESS=ct_GfST8P7YxMv2TpTSwh9SC1qgH7QdQqz8WjCTzyG1sDxxpKNHN PUBLIC_KEY=... SECRET_KEY=... node src/exampleSDK.js`
+## Query the oracle in a contract
+- Deploy [PriceFeedQuery.aes](./PriceFeedQuery.aes) and provide the oracle id of any compatible oracle for deployment
+- Call the `queryAePrice` function by providing a valid coingecko currency code, e.g. `eur` and of course the required oracle fee for the query
+    - to check the query fee call the `queryFee` function
+    - the function will return the oracle query id
+- Call `checkQuery` function by providing the query id in order to get the answer of the oracle
