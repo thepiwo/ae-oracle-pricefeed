@@ -1,4 +1,4 @@
-const PriceFeedOracle = require("./priceFeedOracle")
+const PriceFeedOracle = require("./priceFeedOracle");
 
 const main = async () => {
   const priceFeedOracle = new PriceFeedOracle();
@@ -7,4 +7,4 @@ const main = async () => {
   await priceFeedOracle.startPolling();
 };
 
-main();
+void main();

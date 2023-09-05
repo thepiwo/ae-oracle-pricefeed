@@ -1,6 +1,10 @@
 // THIS IS NOT SECURITY AUDITED
 // DO NEVER USE THIS WITHOUT SECURITY AUDIT FIRST
 
+@compiler >= 7
+
+include "String.aes"
+
 contract PriceFeedQuery =
 
   type o = oracle(string, string)

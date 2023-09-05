@@ -9,9 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aeternity/aepp-sdk": "^8.1.0",
-    "axios": "^0.21.1",
-    "bignumber.js": "^9.0.1",
+    "@aeternity/aepp-sdk": "^13.2.1",
+    "bignumber.js": "^9.1.2",
     "qrcode-terminal": "^0.12.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.3"
   }
 }
