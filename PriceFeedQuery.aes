@@ -4,6 +4,7 @@
 @compiler >= 7
 
 include "String.aes"
+include "Frac.aes"
 
 contract PriceFeedQuery =
 
@@ -23,5 +24,12 @@ contract PriceFeedQuery =
     require(Oracle.check(state), "ORACLE_CHECK_FAILED")
     Oracle.query(state, currency, fee, RelativeTTL(20), RelativeTTL(20))
 
-  entrypoint checkQuery(query : oq) : option(string) =
+  entrypoint checkQueryStr(query : oq) : option(string) =
     Oracle.get_answer(state, query)
+
+  entrypoint checkQueryFrac(query : oq) : option(Frac.frac) =
+    switch(checkQueryStr(query))
+      None => None
+      Some(str) => switch(String.to_int(str))
+        None => None
+        Some(int) => Some(Frac.make_frac(int, 10^18))

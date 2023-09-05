@@ -1,6 +1,7 @@
 const Aeternity = require("./aeternity");
 const BigNumber = require("bignumber.js");
 const { decode } = require("@aeternity/aepp-sdk");
+const { fetchUpstreamResponse } = require("./upstream");
 
 module.exports = class PriceFeedOracle {
   constructor() {
@@ -83,32 +84,51 @@ module.exports = class PriceFeedOracle {
   startPolling = async () => {
     if (!this.aeternity.client) throw Error("Client not initialized");
 
-    this.stopPollQueries = await this.oracle.pollQueries(this.respond, {
-      interval: 2000,
-    });
+    this.stopPollQueries = this.oracle.pollQueries(
+      (query) => this.respond(query).catch(console.error),
+      {
+        interval: 2000,
+      },
+    );
     console.debug("oracle query polling started");
   };
 
-  respond = async (queries) => {
-    let query = Array.isArray(queries)
-      ? queries.sort((a, b) => a.ttl - b.ttl)[queries.length - 1]
-      : queries;
+  respond = async (query) => {
+    const height = await this.aeternity.client.getHeight();
+
     if (!query || query.response !== "or_Xfbg4g==") return; //return early on no or non-empty response;
+    if (height >= query.ttl) {
+      console.log("not responding to expired ttl", query.id);
+      return;
+    }
 
     const queryString = String(decode(query.query));
-    console.log("oracle got query", queryString, query.id);
+    console.log(
+      "oracle got query",
+      queryString,
+      query.id,
+      "height:",
+      height,
+      "ttl:",
+      query.ttl,
+    );
 
-    const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=aeternity&vs_currencies=${queryString}`,
-    ).then(async (res) => (await res.json()).aeternity[queryString]);
+    const response = await fetchUpstreamResponse(queryString).catch(
+      console.error,
+    );
 
     if (response) {
-      console.log("oracle will respond:", response);
-      await this.oracle.respondToQuery(
-        query.id,
-        new BigNumber(response).toFixed(),
-        { responseTtl: query.responseTtl },
-      );
+      const responseString = new BigNumber(response)
+        .times(10 ** 18)
+        .toNumber()
+        .toString();
+
+      console.log("oracle will respond:", response, `raw: (${responseString})`);
+      await this.oracle
+        .respondToQuery(query.id, responseString, {
+          responseTtl: query.responseTtl,
+        })
+        .catch(console.error);
     } else {
       console.log("oracle will not respond, no result found in page");
     }

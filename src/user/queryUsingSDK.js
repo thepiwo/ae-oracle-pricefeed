@@ -1,4 +1,5 @@
 const { Node, MemoryAccount, AeSdk } = require("@aeternity/aepp-sdk");
+const BigNumber = require("bignumber.js");
 
 const url = "https://testnet.aeternity.io/";
 
@@ -31,8 +32,8 @@ class QueryUsingSDK {
     const query = await this.oracle.postQuery(currency, {
       queryFee: this.oracle.queryFee,
       // optionally specify ttl
-      // queryTtl: {type: 'delta', value: 20},
-      // responseTtl: {type: 'delta', value: 20},
+      //queryTtl: { type: "delta", value: 20 },
+      //responseTtl: { type: "delta", value: 20 },
     });
 
     console.log(`queried for '${currency}' with query id: ${query.id}`);
@@ -41,7 +42,11 @@ class QueryUsingSDK {
 
   pollForResponse = async (query) => {
     const response = await query.pollForResponse();
-    console.log("got response:", response);
+    console.log(
+      "got response:",
+      new BigNumber(response).div(10 ** 18).toFixed(),
+      `raw: (${response})`,
+    );
   };
 }
 
