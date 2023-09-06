@@ -5,6 +5,7 @@
 
 include "String.aes"
 include "Frac.aes"
+include "Option.aes"
 
 contract PriceFeedQuery =
 
@@ -22,11 +23,13 @@ contract PriceFeedQuery =
     require(Call.value == fee, String.concat("AMOUNT_NOT_EQUAL_FEE_", Int.to_str(fee)))
     require(String.length(currency) == 3, "INCORRECT_CURRENCY_LENGTH")
     require(Oracle.check(state), "ORACLE_CHECK_FAILED")
-    Oracle.query(state, currency, fee, RelativeTTL(20), RelativeTTL(20))
+    Oracle.query(state, currency, fee, RelativeTTL(10), RelativeTTL(10))
 
+  // with the current implementation, the response is expected to be multiplied by 10^18 to provide greater int precision
   entrypoint checkQueryStr(query : oq) : option(string) =
     Oracle.get_answer(state, query)
 
+  // return query response as fractional representation, which can be used for further calculations
   entrypoint checkQueryFrac(query : oq) : option(Frac.frac) =
     switch(checkQueryStr(query))
       None => None

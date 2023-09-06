@@ -25,7 +25,7 @@ cd ae-oracle-pricefeed
 docker build -t ae-oracle-pricefeed .
 
 # run, follow instructions to fund account, configure NODE_URL for other aeternity node
-docker run -it --name pricefeed -v "$PWD/.data:/app/.data" -e NODE_URL=https://testnet.aeternity.io/ ae-oracle-pricefeed
+docker run -it --init --name pricefeed -v "$PWD/.data:/app/.data" -e NODE_URL=https://testnet.aeternity.io/ ae-oracle-pricefeed
 ```
 
 ## Hosted on mainnet
@@ -45,4 +45,5 @@ There the ae-oracle-pricefeed oracle is running on mainnet:
 - Call the `queryAePrice` function by providing a valid coingecko currency code, e.g. `eur` and of course the required oracle fee for the query
     - to check the query fee call the `queryFee` function
     - the function will return the oracle query id
-- Call `checkQuery` function by providing the query id in order to get the answer of the oracle
+- Call the `checkQueryStr` function by providing the query id in order to get the response of the oracle as string, multiplied by 10^18 to provide greater int precision 
+- Call the `checkQueryFrac` function by providing the query id in order to get the response of the oracle in fractional representation 
